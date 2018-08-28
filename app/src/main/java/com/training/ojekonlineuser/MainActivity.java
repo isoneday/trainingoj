@@ -1,10 +1,14 @@
 package com.training.ojekonlineuser;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -17,6 +21,7 @@ import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.training.ojekonlineuser.activity.HalamanUtamaActivity;
+import com.training.ojekonlineuser.helper.HeroHelper;
 import com.training.ojekonlineuser.helper.SessionManager;
 import com.training.ojekonlineuser.model.Data;
 import com.training.ojekonlineuser.model.ResponseLogin;
@@ -49,6 +54,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+                    != PackageManager.PERMISSION_GRANTED
+                   ) {
+                requestPermissions(
+                        new String[]{Manifest.permission.READ_PHONE_STATE},
+                        110);
+
+
+            }
+            return;
+        }
     }
 
     @OnClick({R.id.btnSignIn, R.id.btnRegister})
@@ -89,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     // memasukkan data ke webservice
                     //todo 2 get instance atau inisialisasi retrofit
                     RestApi api = InitRetrofit.getintance();
-                    String device = "dsewew";
+                    String device = HeroHelper.getDeviceUUID(MainActivity.this);
                     Call<ResponseLogin> loginCall = api.loginuser(device, holder.edtEmail.getText().toString(),
                             holder.edtPassword.getText().toString());
                     loginCall.enqueue(new Callback<ResponseLogin>() {
